@@ -5,7 +5,7 @@ license: MIT
 metadata:
   author: Bang Tutorial
   author_url: https://youtube.com/bangtutorial
-  version: "1.19.0"
+  version: "1.20.0"
   updated: "2026-09-14"
   homepage: https://github.com/bangtutorial/bang-motion
 ---
@@ -132,6 +132,7 @@ VO, yang berbeda hanya cara produksinya.
 | Kinetic typography / lirik | 15–60 dtk | teks adalah subjek; split per kata/huruf; ritme mengikuti audio | `techniques.md` (split + blur berarah, pan 3D per kata) |
 | Title / lower third / bumper segmen | 2–6 dtk | elemen kecil di atas footage, masuk-keluar bersih, latar transparan | `techniques.md` |
 | Explainer / video penjelasan | 30–90 dtk | fakta bersumber, entitas tampil, sudut pandang berganti, lima gaya | `references/explainer.md` + starter per gaya |
+| Segmen data (di dalam explainer/opener) | 4–6,5 dtk per shot | angka/grafik jadi kejadian: osiloskop, kawanan titik, sumbu jebol, jarum, pita skala, slider sebelum/sesudah, gulir-rem, garis waktu | `references/data-shots.md` |
 
 ## Explainer dan karakter: baca sebelum menentukan shot
 

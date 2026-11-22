@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.20.0 — 2026-11-22
+
+**Shot data**
+- `references/data-shots.md`: delapan resep shot untuk segmen angka/grafik (osiloskop, kawanan
+  titik, sumbu jebol, jarum sapu, pita skala, slider sebelum/sesudah, gulir-rem, garis waktu),
+  diadaptasi dari kategori *data* video-shotcraft (Apache-2.0) ke GSAP + detik.
+- Aturan bersama: konteks data asli, satu aksen = satu kejadian, diam total ≥ 1 dtk di akhir,
+  blur dihitung dari selisih posisi (deterministik).
+
 ## 1.19.0 — 2026-09-15
 
 **Ukuran shot — kamera ke elemen**
