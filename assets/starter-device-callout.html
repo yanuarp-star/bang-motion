@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="id">
+<!-- Made with the Bang Motion skill v1.21.0 by Bang Tutorial (https://youtube.com/bangtutorial) - MIT - https://github.com/bangtutorial/bang-motion -->
+<head>
+<meta charset="utf-8">
+<title>Callout Kit</title>
+<!--
+  STARTER GAYA DEVICE — Callout Kit (9:16, 1080×1920, ±8 dtk demo).
+  Coretan tangan di atas FOOTAGE ASLI: lingkaran goyang yang tergambar
+  (lebih dari satu putaran, seperti spidol), panah melengkung + kepala panah,
+  label kuning meletup, siku pembidik mengunci objek, stabilo menyapu tulisan.
+  Isi FOOT_SRC dengan klip sendiri (mis. 'assets/wattmeter.mp4'); adegan vektor
+  #ph cuma pengganti footage. Footage harus diam (tripod) di bagian yang
+  dianotasi — anotasi ada di ruang layar, tidak ikut goyangan kamera.
+  Banyak klip / potong / perlambat → pakai helper clip() dari starter-opener.html.
+  Kontrak bersama: semua gerak = fungsi murni tl.time() (render(t) + tween di tl).
+  ?debug=1 = panel scrub · ?clean=1 = untuk snap/export (tanpa autoplay).
+  Palet & huruf = gaya infografis v1 (kuning listrik, krem, hijau uang, tinta;
+  Space Grotesk + JetBrains Mono). Semua angka di demo = CONTOH: ganti dengan
+  angka bersumber sebelum dipakai.
+-->
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F4F1EA;--bg2:#ECE5D6;--desk:#E4DAC5;--ink:#15171C;--volt:#F5C518;--money:#1F8F63;--lcd:#1C2117;--panel:#FBFAF6;--metal:#D8D4CB;--silver:#ECECEF;--cream:#F4F1EA}
+html,body{margin:0;height:100%;background:#0d0e10;overflow:hidden}
+#stage{position:absolute;left:50%;top:50%;width:1080px;height:1920px;overflow:hidden;background:var(--bg);
+  font-family:'Space Grotesk',sans-serif;color:var(--ink)}
+#stage svg{position:absolute;inset:0;width:1080px;height:1920px;overflow:visible}
+#bg{position:absolute;inset:0;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%)}
+.blob{position:absolute;width:1100px;height:1100px;border-radius:50%;
+  background:radial-gradient(circle,color-mix(in srgb,var(--volt) 30%,transparent),transparent 66%)}
+#grid{position:absolute;inset:-120px}
+#ui{position:absolute;inset:0;pointer-events:none}
+.hl{position:absolute;left:84px;right:84px;font-weight:500;font-size:104px;line-height:1.02;letter-spacing:-.025em;opacity:0}
+.hl b{font-weight:700}
+.hl .wd{display:inline-block;white-space:nowrap;transform-origin:50% 100%}
+.top{top:200px}.bot{top:1560px}
+#dbg{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);display:none;gap:12px;align-items:center;padding:10px 16px;border-radius:14px;
+  background:rgba(14,16,22,.9);color:#cfd5e3;font:13px system-ui;z-index:50}
+#dbg input{width:360px}#dbg span{font-variant-numeric:tabular-nums;min-width:6ch}
+#bg{display:none}
+#foot,#ph{position:absolute;inset:0;width:1080px;height:1920px;object-fit:cover}
+#ph{filter:saturate(.85) contrast(.95)}
+#ann{position:absolute;inset:0}
+.lbl text{font-family:'Space Grotesk',sans-serif;font-weight:700}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="bg">
+    <div class="blob" id="b1"></div><div class="blob" id="b2"></div>
+    <svg id="grid" viewBox="0 0 1320 2160"><defs><pattern id="gp" width="90" height="90" patternUnits="userSpaceOnUse">
+      <path d="M90 0H0V90" fill="none" stroke="rgba(21,23,28,.075)" stroke-width="2"/></pattern></defs>
+      <rect width="1320" height="2160" fill="url(#gp)"/></svg>
+  </div>
+  <video id="foot" muted playsinline preload="auto"></video>
+  <svg id="ph" viewBox="0 0 1080 1920"></svg>
+  <svg id="ann" viewBox="0 0 1080 1920"></svg>
+  <div id="dbg"><button id="dPlay">Pause</button><input id="dScrub" type="range" min="0" max="1000" value="0"><span id="dClock">0.00s</span></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+const W=1080,H=1920,DUR=8;
+const $=s=>document.querySelector(s), NS='http://www.w3.org/2000/svg';
+function S(tag,attrs={},parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
+const T=(txt,x,y,attrs,parent)=>{const e=S('text',{x,y,...attrs},parent);e.textContent=txt;return e;};
+const clamp=x=>x<0?0:x>1?1:x, smooth=x=>{x=clamp(x);return x*x*(3-2*x);};
+/* posisi = fungsi murni waktu: seg(t, mulai, durasi, dari, ke, ease) */
+const seg=(t,t0,d,a,b,ease='power2.inOut')=>a+(b-a)*gsap.parseEase(ease)(clamp((t-t0)/d));
+/* noise ber-seed (deterministik) untuk goyangan tangan dsb. */
+const rnd=s=>{const x=Math.sin(s*127.1+311.7)*43758.5453;return x-Math.floor(x);};
+function fit(){const s=Math.min(innerWidth/W,innerHeight/H);$('#stage').style.transform=`translate(-50%,-50%) scale(${s})`;}
+addEventListener('resize',fit);fit();
+const MONO="'JetBrains Mono',monospace", GROT="'Space Grotesk',sans-serif";
+
+/* odometer SVG (tanda tangan gaya v1: angka selalu berputar) */
+let clipN=0;
+function odo(parent,x,y,n,size,fill,weight=700){
+  const g=S('g',{transform:`translate(${x} ${y})`},parent),cw=size*.6,step=size*1.1,id='oc'+(clipN++);
+  const cp=S('clipPath',{id},g);S('rect',{x:-4,y:-size*.84,width:n*cw+8,height:size*.98},cp);
+  const inner=S('g',{'clip-path':`url(#${id})`},g),cols=[];
+  for(let i=0;i<n;i++){const c=S('g',{},inner);for(let d=0;d<11;d++)T(String(d%10),i*cw,d*step,{fill,'font-size':size,'font-family':MONO,'font-weight':weight},c);cols.push(c);}
+  return {g,cols,n,step,cw};}
+function setOdo(o,v){for(let i=0;i<o.n;i++){const k=o.n-1-i,p=10**k;let off;
+    if(k===0)off=v%10;else{off=Math.floor(v/p)%10;const lower=v%p;if(lower>p-1)off+=lower-(p-1);}
+    o.cols[i].setAttribute('transform',`translate(0 ${-off*o.step})`);
+    o.cols[i].setAttribute('opacity',(k>0&&v<p-.5)?.16:1);}}
+
+/* objek flat + garis tinta (generik, tanpa logo merek) */
+function drawSFF(parent,x,y,s=1){const g=S('g',{transform:`translate(${x} ${y}) scale(${s})`},parent);
+  S('rect',{x:24,y:204,width:60,height:12,rx:4,fill:'var(--ink)'},g);S('rect',{x:376,y:204,width:60,height:12,rx:4,fill:'var(--ink)'},g);
+  S('rect',{x:0,y:0,width:460,height:210,rx:16,fill:'var(--metal)',stroke:'var(--ink)','stroke-width':6},g);
+  S('rect',{x:26,y:28,width:210,height:26,rx:7,fill:'#C2BCB0',stroke:'var(--ink)','stroke-width':3},g);
+  for(let i=0;i<9;i++)S('line',{x1:262+i*17,y1:110,x2:262+i*17,y2:180,stroke:'var(--ink)','stroke-width':4,'stroke-linecap':'round',opacity:.55},g);
+  [0,1,2].forEach(i=>S('rect',{x:30+i*48,y:150,width:34,height:16,rx:3,fill:'var(--ink)'},g));
+  S('circle',{cx:420,cy:42,r:15,fill:'none',stroke:'var(--ink)','stroke-width':4},g);
+  const led=S('circle',{cx:420,cy:88,r:7,fill:'var(--volt)'},g);return {g,led};}
+function drawMini(parent,x,y,s=1,fill='var(--silver)'){const g=S('g',{transform:`translate(${x} ${y}) scale(${s})`},parent);
+  S('rect',{x:0,y:0,width:320,height:80,rx:24,fill,stroke:'var(--ink)','stroke-width':6},g);
+  S('line',{x1:26,y1:22,x2:294,y2:22,stroke:'#fff','stroke-width':5,'stroke-linecap':'round'},g);
+  S('circle',{cx:286,cy:54,r:5,fill:'#9ad8b8'},g);return g;}
+
+/* judul per kata (masuk dari bawah + blur), sama dengan gaya v1 */
+function prep(id){const el=$(id);el.innerHTML=el.innerHTML.replace(/(<b>.*?<\/b>|[^\s<]+)/g,m=>m.startsWith('<b>')?`<b>${m.slice(3,-4).split(' ').map(w=>`<span class="wd">${w}</span>`).join(' ')}</b>`:`<span class="wd">${m}</span>`);}
+const tl=gsap.timeline({paused:true});
+function say(t,id,dir=1){prep(id);const ws=$(id).querySelectorAll('.wd');tl.set(id,{opacity:1},t);
+  tl.fromTo(ws,{opacity:0,yPercent:60*dir,scaleY:1.35,filter:'blur(12px)'},{opacity:1,yPercent:0,scaleY:1,filter:'blur(0px)',duration:.55,ease:'power3.out',stagger:.09,immediateRender:false},t);}
+function unsay(t,id){tl.to($(id).querySelectorAll('.wd'),{opacity:0,yPercent:-55,scaleY:1.25,filter:'blur(12px)',duration:.32,ease:'power2.in',stagger:.035},t);}
+
+const RENDER=[];
+/* latar bernapas melambat halus lalu berhenti 1 dtk sebelum akhir (aturan "diam total") */
+const BG_F=DUR-1.6,BG_R=.6;
+const bgTime=t=>t<BG_F?t:BG_F+Math.min(t-BG_F,BG_R)-Math.min(t-BG_F,BG_R)**2/(2*BG_R);
+function render(){const t0=tl.time(),t=bgTime(t0);
+  const b1=$('#b1'),b2=$('#b2');
+  if(b1)b1.style.transform=`translate(${-260+Math.sin(t*.42)*70}px,${120+Math.cos(t*.35)*60}px)`;
+  if(b2)b2.style.transform=`translate(${420+Math.cos(t*.31)*80}px,${1100+Math.sin(t*.4)*70}px)`;
+  const g=$('#grid');if(g)g.style.transform=`scale(${1.02+Math.sin(t*.7)*.02})`;
+  for(const f of RENDER)f(t0);}
+
+/* ================= GAYA ================= */
+const FOOT_SRC='';          // ← isi path klip footage asli; kosong = pakai adegan pengganti
+const foot=$('#foot'), ph=$('#ph'), ann=$('#ann');
+
+/* ---------- footage: ikut jam timeline (presisi frame untuk snap/export) ---------- */
+if(FOOT_SRC){foot.src=FOOT_SRC;ph.style.display='none';
+  window.OPENER_EXTRA={clipsReady:()=>foot.readyState>=2,
+    seekFrame:t=>new Promise(res=>{foot.pause();if(Math.abs(foot.currentTime-t)<.001)return res();foot.addEventListener('seeked',()=>res(),{once:true});foot.currentTime=t;})};
+  RENDER.push(t=>{if(tl.paused()){if(!foot.paused)foot.pause();if(Math.abs(foot.currentTime-t)>.02)foot.currentTime=t;}
+    else{if(foot.paused)foot.play().catch(()=>{});if(Math.abs(foot.currentTime-t)>.15)foot.currentTime=t;}});
+}else{
+  /* adegan pengganti: meja kayu gelap, PC SFF, watt-meter, catatan tempel */
+  S('rect',{width:1080,height:1920,fill:'#4a3b2f'},ph);
+  S('rect',{y:1260,width:1080,height:660,fill:'#5d4a39'},ph);
+  S('rect',{y:1252,width:1080,height:10,fill:'#2e241c'},ph);
+  drawSFF(ph,90,860,1.75);
+  const m=S('g',{transform:'translate(600 1330) scale(1.45)'},ph);
+  S('rect',{x:0,y:0,width:260,height:200,rx:28,fill:'var(--panel)',stroke:'var(--ink)','stroke-width':6},m);
+  S('rect',{x:22,y:24,width:216,height:100,rx:12,fill:'var(--lcd)'},m);
+  T('25 W',130,98,{'text-anchor':'middle',fill:'var(--volt)','font-size':72,'font-family':MONO,'font-weight':700},m);
+  S('circle',{cx:130,cy:162,r:22,fill:'none',stroke:'var(--ink)','stroke-width':4},m);
+  const note=S('g',{transform:'translate(150 500) rotate(-4)'},ph);
+  S('rect',{width:560,height:150,fill:'#efe3a6',stroke:'rgba(0,0,0,.25)','stroke-width':3},note);
+  T('i5-6500T · 16 GB',34,94,{'font-size':48,'font-family':MONO,'font-weight':700,fill:'#2a2a2a'},note);
+  T('FOOTAGE PENGGANTI — isi FOOT_SRC',540,1840,{'text-anchor':'middle','font-size':30,'font-family':MONO,fill:'rgba(255,255,255,.45)'},ph);
+}
+
+/* ---------- alat coret (semua ruang layar) ---------- */
+const INK='var(--ink)', VOLT='var(--volt)';
+/* garis spidol = tinta tebal di bawah + kuning di atas, tergambar lewat dashoffset (pathLength=1) */
+function stroke2(d,w=12){const g=S('g',{},ann);
+  const a=S('path',{d,fill:'none',stroke:INK,'stroke-width':w+10,'stroke-linecap':'round','stroke-linejoin':'round',pathLength:1,'stroke-dasharray':'1 1','stroke-dashoffset':1},g);
+  const b=S('path',{d,fill:'none',stroke:VOLT,'stroke-width':w,'stroke-linecap':'round','stroke-linejoin':'round',pathLength:1,'stroke-dasharray':'1 1','stroke-dashoffset':1},g);
+  return [a,b];}
+const draw=(t,ps,dur=.45,ease='power2.out')=>tl.to(ps,{attr:{'stroke-dashoffset':0},duration:dur,ease},t);
+/* lingkaran goyang: >1 putaran, jari-jari bergoyang dari noise ber-seed */
+function wobble(cx,cy,rx,ry,seed=1,turns=1.14){let d='';const N=90,a0=-2.2+rnd(seed)*.6;
+  for(let k=0;k<=N;k++){const u=k/N,a=a0+u*turns*Math.PI*2,f=1+.05*Math.sin(a*3+seed)+.06*(u-.5);
+    d+=(k?'L':'M')+(cx+Math.cos(a)*rx*f).toFixed(1)+' '+(cy+Math.sin(a)*ry*f).toFixed(1);}return d;}
+/* panah melengkung: badan dulu, kepala menyusul */
+function arrow(t,[x1,y1],[x2,y2],bend=.25){const mx=(x1+x2)/2-(y2-y1)*bend,my=(y1+y2)/2+(x2-x1)*bend;
+  const body=stroke2(`M${x1} ${y1} Q${mx} ${my} ${x2} ${y2}`,11);
+  const ang=Math.atan2(y2-my,x2-mx),L=46,h=a=>`${x2+Math.cos(ang+Math.PI+a)*L} ${y2+Math.sin(ang+Math.PI+a)*L}`;
+  const head=stroke2(`M${h(.5)} L${x2} ${y2} L${h(-.5)}`,11);
+  draw(t,body,.42);draw(t+.38,head,.16,'power1.out');}
+/* label kuning */
+function label(t,x,y,txt,anchor='middle'){const o=S('g',{transform:`translate(${x} ${y})`},ann),g=S('g',{},o);
+  const w=txt.length*31+64,x0=anchor==='middle'?-w/2:anchor==='end'?-w:0;
+  S('rect',{x:x0,y:-52,width:w,height:94,rx:18,fill:VOLT,stroke:INK,'stroke-width':7},g);
+  T(txt,x0+w/2,16,{'text-anchor':'middle','font-size':54,'font-weight':700,'font-family':GROT,fill:INK},g);
+  tl.fromTo(g,{scale:0,rotation:-8,svgOrigin:'0 0'},{scale:1,rotation:-2,duration:.45,ease:'back.out(2.6)'},t);return g;}
+/* siku pembidik: 4 L terbang masuk dari luar layar, mengunci kotak (x,y,w,h) */
+function brackets(t,x,y,w,h){const s=56,C=[[x,y,1,1],[x+w,y,-1,1],[x,y+h,1,-1],[x+w,y+h,-1,-1]];
+  C.forEach(([cx,cy,dx,dy],i)=>{const o=S('g',{transform:`translate(${cx} ${cy})`},ann),g=S('g',{},o);
+    const d=`M0 ${s*dy} L0 0 L${s*dx} 0`;
+    S('path',{d,fill:'none',stroke:INK,'stroke-width':22,'stroke-linecap':'round','stroke-linejoin':'round'},g);
+    S('path',{d,fill:'none',stroke:VOLT,'stroke-width':12,'stroke-linecap':'round','stroke-linejoin':'round'},g);
+    tl.fromTo(g,{x:-dx*520,y:-dy*360,opacity:0},{x:0,y:0,opacity:1,duration:.4,ease:'back.out(2.4)'},t);});}
+/* stabilo: kotak kuning multiply menyapu dari kiri */
+function highlight(t,tx,ty,rot,x,y,w,h){const o=S('g',{transform:`translate(${tx} ${ty}) rotate(${rot})`},ann);   // tx,ty,rot = transform objek di footage
+  const r=S('rect',{x,y,width:w,height:h,rx:8,fill:VOLT,opacity:.55,style:'mix-blend-mode:multiply'},o);
+  tl.fromTo(r,{attr:{width:0}},{attr:{width:w},duration:.5,ease:'power2.inOut'},t);}
+
+/* ---------- urutan (ganti koordinat sesuai footage) ---------- */
+// 1) lingkari angka di watt-meter, panah dari label
+draw(.4,stroke2(wobble(789,1442,250,120,3)),.5);
+arrow(.95,[330,1650],[545,1500],.3);
+label(1.25,300,1740,'25 W idle');
+// 2) kunci PC dengan siku pembidik
+brackets(2.9,70,840,850,420);
+label(3.35,80,790,'PC bekas kantor','start');
+// 3) stabilo spesifikasi di catatan tempel
+highlight(4.6,150,500,-4,24,42,490,72);
+/* ================= /GAYA ================= */
+
+tl.to({},{duration:.01},DUR);
+gsap.ticker.add(render);
+const q=new URLSearchParams(location.search);
+function start(){tl.play(0);}
+tl.eventCallback('onComplete',()=>{if(!q.has('clean'))start();});
+window.OPENER=Object.assign({W,H,DURATION:DUR,tl,ready:false,seek(t){tl.pause(t,false);render();},play:start},window.OPENER_EXTRA||{});
+addEventListener('keydown',e=>{if(/^[rR]$/.test(e.key))start();if(e.code==='Space'){e.preventDefault();tl.paused()?tl.play():tl.pause();}});
+if(q.has('debug')){const dbg=$('#dbg');dbg.style.display='flex';const sc=$('#dScrub'),ck=$('#dClock');let drag=false;
+  gsap.ticker.add(()=>{if(!drag)sc.value=String(tl.time()/DUR*1000);ck.textContent=tl.time().toFixed(2)+'s';$('#dPlay').textContent=tl.paused()?'Play':'Pause';});
+  sc.addEventListener('pointerdown',()=>{drag=true;tl.pause();});addEventListener('pointerup',()=>drag=false);
+  sc.addEventListener('input',()=>{tl.pause();tl.time(sc.value/1000*DUR);});$('#dPlay').onclick=()=>tl.paused()?tl.play():tl.pause();}
+document.fonts.ready.then(()=>{render();window.OPENER.ready=true;if(!q.has('clean'))start();});
+</script>
+</body>
+</html>

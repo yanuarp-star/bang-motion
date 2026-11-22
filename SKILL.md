@@ -5,7 +5,7 @@ license: MIT
 metadata:
   author: Bang Tutorial
   author_url: https://youtube.com/bangtutorial
-  version: "1.20.0"
+  version: "1.21.0"
   updated: "2026-09-14"
   homepage: https://github.com/bangtutorial/bang-motion
 ---
@@ -133,6 +133,7 @@ VO, yang berbeda hanya cara produksinya.
 | Title / lower third / bumper segmen | 2–6 dtk | elemen kecil di atas footage, masuk-keluar bersih, latar transparan | `techniques.md` |
 | Explainer / video penjelasan | 30–90 dtk | fakta bersumber, entitas tampil, sudut pandang berganti, lima gaya | `references/explainer.md` + starter per gaya |
 | Segmen data (di dalam explainer/opener) | 4–6,5 dtk per shot | angka/grafik jadi kejadian: osiloskop, kawanan titik, sumbu jebol, jarum, pita skala, slider sebelum/sesudah, gulir-rem, garis waktu | `references/data-shots.md` |
+| Konten perangkat / homelab 9:16 | 8–10 dtk per adegan | terminal diketik, versus split, anotasi di footage asli, blueprint ukuran, lineup ukuran, exploded view isometrik (gaya v1) | `references/gaya-device.md` + `assets/starter-device-*.html` |
 
 ## Explainer dan karakter: baca sebelum menentukan shot
 

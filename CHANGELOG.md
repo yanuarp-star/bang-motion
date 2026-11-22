@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.21.0 — 2026-11-22
+
+**Gaya device (9:16)**
+- Enam starter baru `assets/starter-device-*.html` dengan palet gaya infografis v1: terminal
+  (perintah diketik + stabilo), versus split (belahan diagonal + skor odometer), callout kit
+  (coretan spidol di atas footage asli, sinkron frame), blueprint (garis tergambar + garis ukur),
+  size lineup (kamera meluncur antar perangkat), exploded view isometrik (tanpa Three.js).
+- Panduan pemilihan dan aturan pakai di `references/gaya-device.md`.
+- Latar bernapas melambat dan berhenti 1 dtk sebelum akhir sehingga frame penutup identik.
+
 ## 1.20.0 — 2026-11-22
 
 **Shot data**
