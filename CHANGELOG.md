@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.21.1 — 2026-11-24
+
+**Export MP4 lebih cepat**
+- `local/export-mp4.mjs` sekarang masuk repo dan memotret frame dengan beberapa browser paralel
+  (bawaan setengah core, maks 6; `WORKERS=1` = cara lama). Diukur dulu: yang lambat screenshot
+  Chrome (~70-88 ms/frame), bukan encode x264 (~11 ms/frame), jadi JPEG/VAAPI tidak membantu.
+  Exploded 82 → 15 dtk, Versus 33 → 9 dtk (1080×1920, 30 fps).
+- Tiap browser memotret potongan berurutan (bukan frame selang-seling, karena raster Chrome
+  bergantung riwayat frame dan tepi elemen bisa bergeser ~1 px). Potongan terakhir selalu memuat
+  seluruh ekor diam (≥ 1.7 dtk); segmen disambung `-c copy`.
+- `optimizeForSpeed` pada screenshot, preset x264 `medium` (SSIM setara `slow`), env `PRESET`.
+
 ## 1.21.0 — 2026-11-22
 
 **Gaya device (9:16)**

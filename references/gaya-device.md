@@ -52,4 +52,5 @@ cmp shots/t<DUR-1>.png shots/t<DUR-0.05>.png   # harus identik: diam total di ak
 Periksa: teks tidak terpotong di tepi (label garis ukur, nama perangkat),
 label tidak saling tumpuk, dan anotasi callout tepat di objek footage.
 Export MP4: salin starter jadi `index.html` di folder proyek, lalu jalankan
-`local/export-mp4.mjs <folder> <out.mp4>`.
+`local/export-mp4.mjs <folder> <out.mp4>` (paralel 6 browser; adegan 9-10 dtk selesai dalam ±9-16 dtk,
+`WORKERS=1` untuk cara lama).
